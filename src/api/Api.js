@@ -1,28 +1,21 @@
-import axios from 'axios';
+const Pokedex = require('pokeapi-js-wrapper');
 
 export default class Api {
-  baseUrl = 'https://pokeapi.co/api/v2';
+  options = {
+    protocol: 'https',
+    hostName: 'pokeapi.co',
+    versionPath: '/api/v2/',
+    cache: true,
+    timeout: 5 * 1000,
+  };
 
-  async makeRequest(path) {
-    try {
-      const response = await axios({
-        url: `${this.baseUrl}/${path}/`,
-        method: 'GET',
-      });
-      return response.data;
-    } catch (e) {
-      console.log(e);
-      throw new Error(`${e.response.data} | ${e.response.status}`);
-    }
-  }
+  PokedexApi = new Pokedex.Pokedex(this.options);
 
   getPokemons() {
-    const path = 'pokemon';
-    return this.makeRequest(path);
+    return this.PokedexApi.getPokemonsList();
   }
 
-  getPokemon(id) {
-    const path = 'pokemon';
-    return this.makeRequest(`${path}/${id}`);
+  getPokemon(name) {
+    return this.PokedexApi.getPokemonByName(name);
   }
 }

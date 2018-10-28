@@ -15,7 +15,7 @@ class App extends Component {
   async componentDidMount() {
     const { results: pokemons } = await api.getPokemons();
     const pokemonPromises = [];
-    for (let i = 0; i < 5; i += 1) {
+    for (let i = 0; i < 10; i += 1) {
       const pokemon = pokemons[i];
       pokemonPromises.push(api.getPokemon(pokemon.name));
     }
