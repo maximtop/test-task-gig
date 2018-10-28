@@ -20,6 +20,7 @@ class App extends Component {
       pokemonPromises.push(api.getPokemon(pokemon.name));
     }
     const pokemonsData = await Promise.all(pokemonPromises);
+    console.log(pokemonsData[0]);
     const normalizedPokemonsData = pokemonsData.map((pokemon) => {
       const {
         name, id, sprites: { front_default: avatar }, stats,
@@ -28,6 +29,7 @@ class App extends Component {
         name, id, avatar, stats,
       };
     });
+    console.log(normalizedPokemonsData[0]);
     this.setState(state => ({ ...state, pokemons: normalizedPokemonsData }));
   }
 

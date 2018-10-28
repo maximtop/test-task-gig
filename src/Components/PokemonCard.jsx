@@ -2,15 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
 import classNames from 'classnames';
 
-const styles = {
+const styles = theme => ({
   card: {
     maxWidth: 370,
   },
@@ -25,10 +28,46 @@ const styles = {
   header: {
     textTransform: 'capitalize',
   },
+  tableRow: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.background.default,
+    },
+  },
+});
+
+const prepareStats = stats => stats.map((stat) => {
+  const { base_stat: value, stat: { name } } = stat;
+  return { value, name };
+});
+
+const renderStatsTable = (stats, classes) => {
+  const preparedStats = prepareStats(stats);
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Stat name</TableCell>
+          <TableCell numeric>Value</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {preparedStats.map(stat => (
+          <TableRow className={classes.tableRow} key={stat.name}>
+            <TableCell component="th" scope="row">
+              {stat.name}
+            </TableCell>
+            <TableCell numeric>{stat.value}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
 };
 
 function PokemonCard(props) {
   const { classes, pokemon } = props;
+  const { stats } = pokemon;
+
 
   return (
     <Card className={classes.card}>
@@ -49,19 +88,8 @@ function PokemonCard(props) {
       />
 
       <CardContent>
-        <Typography component="p">
-          Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-          across all continents except Antarctica
-        </Typography>
+        {renderStatsTable(stats, classes)}
       </CardContent>
-      <CardActions>
-        <Button size="small" color="primary">
-          Share
-        </Button>
-        <Button size="small" color="primary">
-          Learn More
-        </Button>
-      </CardActions>
     </Card>
   );
 }
