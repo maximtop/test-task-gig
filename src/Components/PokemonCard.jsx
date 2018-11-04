@@ -67,8 +67,6 @@ const renderStatsTable = (stats, classes) => {
 function PokemonCard(props) {
   const { classes, pokemon } = props;
   const { stats } = pokemon;
-
-
   return (
     <Card className={classes.card}>
       <CardHeader

@@ -17,6 +17,8 @@ module.exports = {
       },
     ],
   },
+  // TODO change for production
+  devtool: 'source-map',
   resolve: { extensions: ['.js', '.jsx'] },
   output: {
     path: path.resolve(__dirname, 'dist/'),
