@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -11,7 +11,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
+import Chip from '@material-ui/core/Chip';
 import classNames from 'classnames';
+import { observer } from 'mobx-react';
+import store from '../store/PokemonsStore';
+import { prepareStats } from '../helpers';
 
 const styles = theme => ({
   card: {
@@ -33,11 +37,6 @@ const styles = theme => ({
       backgroundColor: theme.palette.background.default,
     },
   },
-});
-
-const prepareStats = stats => stats.map((stat) => {
-  const { base_stat: value, stat: { name } } = stat;
-  return { value, name };
 });
 
 const renderStatsTable = (stats, classes) => {
@@ -64,32 +63,49 @@ const renderStatsTable = (stats, classes) => {
   );
 };
 
-function PokemonCard(props) {
-  const { classes, pokemon } = props;
-  const { stats } = pokemon;
+const renderTypes = (types) => {
+  const pokemonsTypes = store.getPokemonsTypes;
   return (
-    <Card className={classes.card}>
-      <CardHeader
-        className={classes.header}
-        avatar={(
-          <Avatar
-            alt={pokemon.name}
-            src={pokemon.avatar}
-            className={classNames(classes.avatar, classes.bigAvatar)}
-          />
-        )}
-        title={(
-          <Typography variant="h4" className={classes.header}>
-            {pokemon.name}
-          </Typography>
-        )}
-      />
-
-      <CardContent>
-        {renderStatsTable(stats, classes)}
-      </CardContent>
-    </Card>
+    <div>
+      {types.map((type) => {
+        const { type: { name } } = type;
+        const { color } = pokemonsTypes[name];
+        return <Chip key={name} style={{ backgroundColor: color }} label={name} />;
+      })}
+    </div>
   );
+};
+
+@observer
+class PokemonCard extends Component {
+  render() {
+    const { classes, pokemon } = this.props;
+    const { stats, types } = pokemon;
+    return (
+      <Card className={classes.card}>
+        <CardHeader
+          className={classes.header}
+          avatar={(
+            <Avatar
+              alt={pokemon.name}
+              src={pokemon.avatar}
+              className={classNames(classes.avatar, classes.bigAvatar)}
+            />
+        )}
+          title={(
+            <Typography variant="h4" className={classes.header}>
+              {pokemon.name}
+            </Typography>
+        )}
+        />
+
+        <CardContent>
+          {renderTypes(types)}
+          {renderStatsTable(stats, classes)}
+        </CardContent>
+      </Card>
+    );
+  }
 }
 
 PokemonCard.propTypes = {

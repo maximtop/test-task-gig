@@ -18,4 +18,8 @@ export default class Api {
   getPokemon(name) {
     return this.PokedexApi.getPokemonByName(name);
   }
+
+  getPokemonsTypes() {
+    return this.PokedexApi.getTypesList();
+  }
 }

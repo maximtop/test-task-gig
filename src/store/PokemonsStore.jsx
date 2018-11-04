@@ -6,6 +6,7 @@ import {
   computed,
 } from 'mobx';
 import Api from '../api/Api';
+import { preparePokemons, preparePokemonsTypes } from '../helpers';
 
 const api = new Api();
 configure({ enforceActions: 'observed' });
@@ -14,6 +15,8 @@ class PokemonsStore {
   @observable pokemons = [];
 
   @observable fetchState = 'pending'; // pending, done, error
+
+  @observable pokemonsTypes = [];
 
   @observable searchKey = '';
 
@@ -36,15 +39,22 @@ class PokemonsStore {
         pokemonsDataPromises.push(api.getPokemon(pokemon.name));
       }
       const pokemonsData = await Promise.all(pokemonsDataPromises);
+      const { results: pokemonsTypes } = await api.getPokemonsTypes();
       runInAction(() => {
         this.fetchState = 'done';
-        this.pokemons = pokemonsData;
+        this.pokemons = preparePokemons(pokemonsData);
+        this.pokemonsTypes = preparePokemonsTypes(pokemonsTypes);
       });
     } catch (error) {
       runInAction(() => {
         this.fetchState = 'error';
       });
     }
+  }
+
+  @computed
+  get getPokemonsTypes() {
+    return this.pokemonsTypes;
   }
 
   @computed
