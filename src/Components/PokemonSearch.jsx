@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import store from '../store/PokemonsStore';
@@ -23,14 +24,16 @@ class PokemonSearch extends Component {
   render() {
     const { classes } = this.props;
     return (
-      <TextField
-        id="standard-search"
-        label="Search pokemons by name"
-        type="search"
-        className={classes.textField}
-        margin="normal"
-        onChange={this.handleSearch}
-      />
+      <Grid item>
+        <TextField
+          id="standard-search"
+          label="Search pokemons by name"
+          type="search"
+          className={classes.textField}
+          margin="normal"
+          onChange={this.handleSearch}
+        />
+      </Grid>
     );
   }
 }
