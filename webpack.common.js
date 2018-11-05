@@ -1,9 +1,7 @@
-const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
   entry: './src/index.js',
-  mode: 'development',
   module: {
     rules: [
       {
@@ -17,8 +15,6 @@ module.exports = {
       },
     ],
   },
-  // TODO change for production
-  devtool: 'source-map',
   resolve: { extensions: ['.js', '.jsx'] },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -31,5 +27,4 @@ module.exports = {
     publicPath: 'http://localhost:3000/dist/',
     hotOnly: true,
   },
-  plugins: [new webpack.HotModuleReplacementPlugin()],
 };
