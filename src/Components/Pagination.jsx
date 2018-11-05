@@ -6,7 +6,6 @@ import Input from '@material-ui/core/Input';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
-import { observer } from 'mobx-react';
 import store from '../store/PokemonsStore';
 
 const styles = theme => ({
@@ -22,8 +21,6 @@ const styles = theme => ({
   },
 });
 
-
-@observer
 class Pagination extends Component {
   handleChangeRowsPerPage = (e) => {
     store.setPokemonsPerPage(e.target.value);

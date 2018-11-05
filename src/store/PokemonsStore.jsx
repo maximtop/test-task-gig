@@ -42,7 +42,6 @@ class PokemonsStore {
         this.fetchState = 'done';
         this.pokemons = pokemons;
         this.pokemonsTypes = preparePokemonsTypes(pokemonsTypes);
-        this.pokemonsTotal = pokemons.length;
       });
     } catch (error) {
       runInAction(() => {
@@ -65,34 +64,9 @@ class PokemonsStore {
     });
   }
 
-  @computed
-  get getPokemonsTypes() {
-    return this.pokemonsTypes;
-  }
-
-  filterPokemons(pokemons) {
-    if (this.searchKey === '') {
-      return pokemons;
-    }
-    return pokemons.filter((pokemon) => {
-      const { name } = pokemon;
-      return name.indexOf(this.searchKey) > -1;
-    });
-  }
-
-  @computed
-  get getPokemons() {
-    // TODO fix
-    const filteredPokemons = this.filterPokemons(this.pokemons);
-    // start
-    // 10 per page & 1 page -> 0
-    // 10 per page & 2 page -> 9
-    const start = (this.currentPage - 1) * this.pokemonsPerPage;
-    // end
-    // 10 per page & 1 page -> 10
-    // 10 per page & 2 page -> 19
-    const end = this.currentPage * this.pokemonsPerPage;
-    return filteredPokemons.slice(start, end);
+  @action
+  setPokemonsTotal(total) {
+    this.pokemonsTotal = total;
   }
 
   @action
@@ -110,6 +84,36 @@ class PokemonsStore {
       return;
     }
     this.currentPage += change;
+  }
+
+  @computed
+  get getPokemonsTypes() {
+    return this.pokemonsTypes;
+  }
+
+  filterPokemons(pokemons) {
+    if (this.searchKey === '') {
+      return pokemons;
+    }
+    return pokemons.filter((pokemon) => {
+      const { name } = pokemon;
+      return name.indexOf(this.searchKey) > -1;
+    });
+  }
+
+  @computed
+  get getPokemons() {
+    const filteredPokemons = this.filterPokemons(this.pokemons);
+    this.setPokemonsTotal(filteredPokemons.length);
+    // start
+    // 10 per page & 1 page -> 0
+    // 10 per page & 2 page -> 9
+    const start = (this.currentPage - 1) * this.pokemonsPerPage;
+    // end
+    // 10 per page & 1 page -> 10
+    // 10 per page & 2 page -> 19
+    const end = this.currentPage * this.pokemonsPerPage;
+    return filteredPokemons.slice(start, end);
   }
 
   @computed
