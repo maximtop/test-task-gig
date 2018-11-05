@@ -6,15 +6,13 @@ import {
   computed,
 } from 'mobx';
 import Api from '../api/Api';
-import { preparePokemons, preparePokemonsTypes } from '../helpers';
+import { preparePokemonsTypes } from '../helpers';
 
 const api = new Api();
 configure({ enforceActions: 'observed' });
 
 class PokemonsStore {
   @observable pokemons = [];
-
-  @observable pokemonsData = {};
 
   @observable fetchState = 'pending'; // pending, done, error
 
@@ -39,25 +37,12 @@ class PokemonsStore {
     this.fetchState = 'pending';
     try {
       const { results: pokemons } = await api.getPokemons();
-      if (this.pokemonsTotal === null) {
-        runInAction(() => {
-          this.pokemonsTotal = pokemons.length;
-        });
-      }
-      const pokemonsDataPromises = [];
-      for (let i = ((this.currentPage - 1) * this.pokemonsPerPage);
-        i < (this.currentPage * this.pokemonsPerPage);
-        i += 1) {
-        const pokemon = pokemons[i];
-        this.pokemonsData[pokemon.name] = pokemon;
-        pokemonsDataPromises.push(api.getPokemon(pokemon.name));
-      }
-      const pokemonsData = await Promise.all(pokemonsDataPromises);
       const { results: pokemonsTypes } = await api.getPokemonsTypes();
       runInAction(() => {
         this.fetchState = 'done';
-        this.pokemons = preparePokemons(pokemonsData);
+        this.pokemons = pokemons;
         this.pokemonsTypes = preparePokemonsTypes(pokemonsTypes);
+        this.pokemonsTotal = pokemons.length;
       });
     } catch (error) {
       runInAction(() => {
@@ -67,18 +52,17 @@ class PokemonsStore {
   }
 
   @action
-  async fetchPokemonData(name) {
-
-  }
-
-  @action
-  async getPokemonData(name) {
-    const pokemon = this.pokemonsData[name];
-    if (!pokemon.data) {
-      const { results: pokemonData } = await api.getPokemon(pokemon.name);
-      this.pokemonsData[name] = { ...pokemon, pokemonData };
-    }
-    return this.pokemonsData[name];
+  async getPokemon(name) {
+    const result = await api.getPokemon(name);
+    runInAction(() => {
+      this.pokemons = this.pokemons.map((pokemon) => {
+        if (pokemon.name === result.name) {
+          const avatar = result.sprites.front_default;
+          return { ...pokemon, ...result, avatar };
+        }
+        return pokemon;
+      });
+    });
   }
 
   @computed
@@ -86,34 +70,46 @@ class PokemonsStore {
     return this.pokemonsTypes;
   }
 
-  @computed
-  get getPokemons() {
+  filterPokemons(pokemons) {
     if (this.searchKey === '') {
-      return this.pokemons;
+      return pokemons;
     }
-    return this.pokemons.filter((pokemon) => {
+    return pokemons.filter((pokemon) => {
       const { name } = pokemon;
       return name.indexOf(this.searchKey) > -1;
     });
   }
 
-  @action
-  async setPokemonsPerPage(pokemonsPerPage) {
-    this.pokemonsPerPage = pokemonsPerPage;
-    await this.fetchPokemons();
+  @computed
+  get getPokemons() {
+    // TODO fix
+    const filteredPokemons = this.filterPokemons(this.pokemons);
+    // start
+    // 10 per page & 1 page -> 0
+    // 10 per page & 2 page -> 9
+    const start = (this.currentPage - 1) * this.pokemonsPerPage;
+    // end
+    // 10 per page & 1 page -> 10
+    // 10 per page & 2 page -> 19
+    const end = this.currentPage * this.pokemonsPerPage;
+    return filteredPokemons.slice(start, end);
   }
 
   @action
-  async handleChangePage(change) {
+  setPokemonsPerPage(pokemonsPerPage) {
+    this.pokemonsPerPage = pokemonsPerPage;
+  }
+
+  @action
+  handleChangePage(change) {
     const futureChange = this.currentPage + change;
     if (futureChange <= 0) {
       return;
     }
-    if (futureChange >= this.pokemonsTotal / this.pokemonsPerPage) {
+    if (futureChange > Math.ceil(this.pokemonsTotal / this.pokemonsPerPage)) {
       return;
     }
     this.currentPage += change;
-    await this.fetchPokemons();
   }
 
   @computed

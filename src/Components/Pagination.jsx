@@ -7,7 +7,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import { observer } from 'mobx-react';
-import { toJS } from 'mobx';
 import store from '../store/PokemonsStore';
 
 const styles = theme => ({
@@ -42,7 +41,9 @@ class Pagination extends Component {
     const { classes } = this.props;
     const { pokemonsPerPage, getPokemonTotal, currentPage } = store;
     const currentlyVisiblePokemonsFrom = currentPage * pokemonsPerPage - (pokemonsPerPage - 1);
-    const currentlyVisiblePokemonsTo = currentPage * pokemonsPerPage;
+    const currentlyVisiblePokemonsTo = currentPage * pokemonsPerPage > getPokemonTotal
+      ? getPokemonTotal
+      : currentPage * pokemonsPerPage;
     return (
       <Grid item>
         <span className={classes.title}>Pokemons per page:</span>
@@ -57,7 +58,10 @@ class Pagination extends Component {
             <option value={50}>50</option>
           </NativeSelect>
         </FormControl>
-        <span className={classes.paginationInfo}>{currentlyVisiblePokemonsFrom} - {currentlyVisiblePokemonsTo} of { getPokemonTotal }</span>
+        <span className={classes.paginationInfo}>
+          {/* eslint-disable-next-line react/jsx-one-expression-per-line */}
+          {currentlyVisiblePokemonsFrom} - {currentlyVisiblePokemonsTo} of { getPokemonTotal }
+        </span>
         <IconButton className={classes.button} aria-label="Previous" onClick={this.handlePrevClick}>
           <Icon>navigate_before</Icon>
         </IconButton>

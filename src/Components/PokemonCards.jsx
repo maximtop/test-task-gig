@@ -5,11 +5,10 @@ import PokemonCard from './PokemonCard';
 
 function PokemonCards(props) {
   const { pokemons } = props;
-
   return (
     <Grid container spacing={24} alignContent="center" justify="center">
       {pokemons.map(pokemon => (
-        <Grid item key={pokemon.id}>
+        <Grid item key={pokemon.name}>
           <PokemonCard pokemon={pokemon} />
         </Grid>
       ))}

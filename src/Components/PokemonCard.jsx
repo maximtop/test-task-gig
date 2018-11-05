@@ -12,6 +12,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Chip from '@material-ui/core/Chip';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import store from '../store/PokemonsStore';
@@ -40,6 +41,9 @@ const styles = theme => ({
 });
 
 const renderStatsTable = (stats, classes) => {
+  if (!stats) {
+    return <CircularProgress />;
+  }
   const preparedStats = prepareStats(stats);
   return (
     <Table>
@@ -64,6 +68,9 @@ const renderStatsTable = (stats, classes) => {
 };
 
 const renderTypes = (types) => {
+  if (!types) {
+    return;
+  }
   const pokemonsTypes = store.getPokemonsTypes;
   return (
     <div>
@@ -78,6 +85,13 @@ const renderTypes = (types) => {
 
 @observer
 class PokemonCard extends Component {
+  async componentDidMount() {
+    const { pokemon } = this.props;
+    if (!pokemon.data) {
+      await store.getPokemon(pokemon.name);
+    }
+  }
+
   render() {
     const { classes, pokemon } = this.props;
     const { stats, types } = pokemon;

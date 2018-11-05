@@ -1,6 +1,8 @@
 # POKEDEX 
 ## Test task for GIG company
 
+[View implementation on heroku](https://maximtop-pokedex.herokuapp.com)
+
 **Short description:**
 Implement simple react application
 

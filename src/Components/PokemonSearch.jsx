@@ -17,7 +17,6 @@ const styles = theme => ({
 @observer
 class PokemonSearch extends Component {
   handleSearch = (e) => {
-    // TODO may be it would be useful to use throttle here
     store.updateSearch(e.target.value);
   };
 
